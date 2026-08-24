@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab 03: Tele-Communication System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Lab 03: Tele-Communication System Design</h1>
+    </header>
+    
+    <div class="tabs">
+        <button class="tab-btn active" id="tab-sender">Sender Portal</button>
+        <button class="tab-btn" id="tab-receiver">Receiver Portal</button>
+    </div>
+    
+    <div class="container">
+        <!-- SENDER SECTION -->
+        <section id="sender" class="card tab-content active-tab">
+            <h2>Sender</h2>
+            <div class="input-group">
+                <label for="sender-msg">Original Message (binary):</label>
+                <input type="text" id="sender-msg" value="0100011" placeholder="e.g. 0100011">
+            </div>
+            <div class="input-group">
+                <label for="sender-err-idx">Error Bit Index (0-based, -1 for none):</label>
+                <input type="number" id="sender-err-idx" value="3" placeholder="e.g. 3 or -1">
+            </div>
+            <button id="btn-transmit">START TRANSMISSION</button>
+            
+            <div id="sender-output" class="output" style="display: none;">
+                <h3>Transmitting...</h3>
+                <p>Observe the colors below and enter them in the receiver:</p>
+                <div id="tx-colors" class="color-blocks"></div>
+                
+                <!-- 
+                <details id="sender-debug" style="margin-top: 15px;">
+                    <summary style="cursor: pointer; font-weight: bold; padding: 5px; background: #eee; border-radius: 4px;">Technical Details (Debug)</summary>
+                    <pre id="debug-info"></pre>
+                </details> 
+                -->
+            </div>
+        </section>
+        
+        <!-- RECEIVER SECTION -->
+        <section id="receiver" class="card tab-content">
+            <h2>Receiver</h2>
+            <p>Observe the sender's colors and enter them below:</p>
+            <div class="color-inputs">
+                <button class="color-btn" data-bits="00" style="background-color: #e74c3c;">Color A<br><small>00</small></button>
+                <button class="color-btn" data-bits="01" style="background-color: #3498db;">Color B<br><small>01</small></button>
+                <button class="color-btn" data-bits="10" style="background-color: #2ecc71;">Color C<br><small>10</small></button>
+                <button class="color-btn" data-bits="11" style="background-color: #f1c40f;">Color D<br><small>11</small></button>
+            </div>
+            <div class="rx-controls">
+                <button id="btn-rx-back">BACKSPACE</button>
+                <button id="btn-rx-clear">CLEAR</button>
+                <button id="btn-rx-decode" style="background: #27ae60;">DECODE</button>
+            </div>
+            
+            <div id="rx-sequence" class="color-blocks"></div>
+            
+            <div id="rx-output" class="output" style="display: none;">
+                <h3>Decoding Result</h3>
+                <pre id="rx-result"></pre>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
