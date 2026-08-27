@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lab 03: Tele-Communication System</title>
+    <title>Lab 03: Telecommunication System</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Lab 03: Tele-Communication System Design</h1>
+        <h1>Lab 03: Telecommunication System Design</h1>
     </header>
     
     <div class="tabs">
@@ -16,16 +16,15 @@
     </div>
     
     <div class="container">
-        <!-- SENDER SECTION -->
         <section id="sender" class="card tab-content active-tab">
             <h2>Sender</h2>
             <div class="input-group">
-                <label for="sender-msg">Original Message (binary):</label>
-                <input type="text" id="sender-msg" value="0100011" placeholder="e.g. 0100011">
+                <label for="sender-msg">Original Message:</label>
+                <input type="text" id="sender-msg">
             </div>
             <div class="input-group">
                 <label for="sender-err-idx">Error Bit Index (0-based, -1 for none):</label>
-                <input type="number" id="sender-err-idx" value="3" placeholder="e.g. 3 or -1">
+                <input type="number" id="sender-err-idx">
             </div>
             <button id="btn-transmit">START TRANSMISSION</button>
             
@@ -33,7 +32,6 @@
                 <h3>Transmitting...</h3>
                 <p>Observe the colors below and enter them in the receiver:</p>
                 <div id="tx-colors" class="color-blocks"></div>
-                
                 <!-- 
                 <details id="sender-debug" style="margin-top: 15px;">
                     <summary style="cursor: pointer; font-weight: bold; padding: 5px; background: #eee; border-radius: 4px;">Technical Details (Debug)</summary>
@@ -43,7 +41,6 @@
             </div>
         </section>
         
-        <!-- RECEIVER SECTION -->
         <section id="receiver" class="card tab-content">
             <h2>Receiver</h2>
             <p>Observe the sender's colors and enter them below:</p>
