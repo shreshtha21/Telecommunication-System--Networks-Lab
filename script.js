@@ -6,9 +6,8 @@ const COLORS = {
 };
 
 /* grid dimensions */
-function getGridDimensions(N) {
+function getGridDimen(N) {
     if(N === 0) {return { r: 0, c: 0 };}
-
     let bestR = 1;
     let bestC = N;
     let bestSum = Infinity;
@@ -40,7 +39,7 @@ function encode(message, errorIndex){
 
     //grid for 2d parity
     const N = padMsg.length;
-    const {r,c} =getGridDimensions(N);
+    const {r,c} =getGridDimen(N);
 
         //fill remn bits with 0
     const remn = r*c -N;
@@ -52,7 +51,6 @@ function encode(message, errorIndex){
         const row =gridData.slice(i*c, (i+1)*c).split('').map(Number);
         grid.push(row);
     }
-
 
     //calc parity
     const rowP =new Array(r).fill(0);
@@ -87,7 +85,6 @@ function encode(message, errorIndex){
         finalStr += '0';
     }
 
-
     //bits to colors
     const colors=[];
     for(let i = 0; i<finalStr.length; i += 2) {
@@ -110,26 +107,27 @@ function encode(message, errorIndex){
         colors: colors,
         errorIndex:Number.isNaN(errIdx)? -1: errIdx
     };
-}function decode(colorSeq) {
-// convert to bits
+}
+
+function decode(colorSeq) {
+    // convert to bits
     const rxBits = colorSeq.join('').split('').map(Number);
     if (rxBits.length < 6) {
         return {error: "Not enough bits for the 6-bit length field."};
     }
 
-// get length
+    // get length
     const lengthBits = rxBits.slice(0, 6);
     const L = parseInt(lengthBits.join(''), 2);
     if (L > 63) {
         return {error: "Invalid payload length."};
     }
 
-// padded message length
+    // padded message length
     const paddedLen = (L % 2 !== 0) ? L + 1 : L;
 
-
-// create grid
-    const { r, c } = getGridDimensions(paddedLen);
+    // create grid
+    const { r, c } = getGridDimen(paddedLen);
     const expectedTot = 6 + paddedLen + r + c;
     if (rxBits.length !== expectedTot && rxBits.length !== expectedTot + 1) {
         return {
@@ -137,25 +135,19 @@ function encode(message, errorIndex){
         };
     }
 
-// divide into secctions
+    // divide into secctions
     const rxPayloadBits = rxBits.slice(6, 6 + paddedLen);
     const rxRowParity = rxBits.slice(6 + paddedLen, 6 + paddedLen + r);
     const rxColParity = rxBits.slice(6 + paddedLen + r, expectedTot);
 
-// reconstruct grid
-    const gridData = [
-        ...rxPayloadBits,
-        ...new Array(
-            r * c - paddedLen
-        ).fill(0)
-    ];
-
+    // reconstruct grid
+    const gridData = [...rxPayload.bits, ...new Array(r * c - paddedLen).fill(0)];
     const grid = [];
     for (let i = 0; i < r; i++) {
         grid.push(gridData.slice( i * c, (i + 1) * c));
     }
 
-// calculate parity
+    // calculate parity
     const calculatedRowParity = new Array(r).fill(0);
     const calculatedColParity = new Array(c).fill(0);
 
@@ -167,8 +159,7 @@ function encode(message, errorIndex){
         }
     }
 
-
-// find error
+    // find error
     const badRows = [];
     for (let i = 0; i < r; i++) {
         if (calculatedRowParity[i] !== rxRowParity[i]) {
@@ -181,19 +172,18 @@ function encode(message, errorIndex){
             badCols.push(j);
         }
     }
-// find error index
+    // find error index
     const correctedPayloadBits = [...rxPayloadBits];
     let errorDetected = false;
     let errorBitIndex = -1;
     if (badRows.length === 0 && badCols.length === 0) {
         errorDetected = false;
     }
-
     else if (badRows.length === 1 && badCols.length === 1) {
         const errorRow = badRows[0];
         const errorCol = badCols[0];
 
-// grid to linear
+        // grid to linear
         const gridIndex = errorRow * c + errorCol;
         if (gridIndex >= paddedLen) {
             return {
@@ -201,22 +191,19 @@ function encode(message, errorIndex){
             };
         }
         errorDetected = true;
-
-
-// correct the error bit
+        // correct the error bit
         correctedPayloadBits[gridIndex] ^= 1;
         if(gridIndex < L) {
             errorBitIndex = gridIndex;
         }
     }
-
     else {
         return {
             error: "Parity checks indicate an invalid " + "or unsupported error pattern."
         };
     }
 
-// get correct message
+    // get correct message
     const correctedMessage = correctedPayloadBits.slice(0, L).join('');
     return {
         valid: true,
@@ -244,7 +231,6 @@ document
         document.getElementById('receiver').classList.remove('active-tab');
     });
 
-
 //rcvr tab
 document.getElementById('tab-receiver').addEventListener('click', () => {
         document.getElementById('tab-receiver').classList.add('active');
@@ -252,7 +238,6 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
         document.getElementById('receiver').classList.add('active-tab');
         document.getElementById('sender').classList.remove('active-tab');
     });
-
 
 //sender
 let txInterval = null;
@@ -273,9 +258,7 @@ document.getElementById('btn-transmit').addEventListener('click', () => {
 
     // Error index
     const errInput =document.getElementById('sender-err-idx').value.trim();
-
     const errIdx =errInput === ''? -1: parseInt(errInput, 10);
-
     if (errInput !== '' &&( !Number.isInteger(errIdx) || errIdx < 0 || errIdx >= msg.length)) {
         alert(`Error index must be between 0 and ${msg.length - 1}.`);
         return;
@@ -289,7 +272,6 @@ document.getElementById('btn-transmit').addEventListener('click', () => {
         alert(e.message);
         return;
     }
-
 
     // Transmission container
     const txDiv =document.getElementById('tx-colors');
@@ -369,13 +351,11 @@ document.querySelectorAll('.color-btn').forEach(btn => {
         );
     });
 
-
 //backspace button
 document.getElementById('btn-rx-back').addEventListener('click', () => {
         receivedColors.pop();
         renderReceivedColors();
     });
-
 
 //clear button
 document.getElementById('btn-rx-clear').addEventListener('click', () => {
@@ -420,7 +400,6 @@ ${res.errorDetected ? 'YES' : 'NO'}
             }
         }
 
-
 //correct message
         let payloadStr =res.payload;
         if ( res.errorDetected && res.errorBitIndex >= 0) {
@@ -428,7 +407,6 @@ ${res.errorDetected ? 'YES' : 'NO'}
             payloadStr =payloadStr.substring(0,errIdx) +'[' +payloadStr[errIdx] +']' +payloadStr.substring(errIdx + 1);
         }
         out +=`\nCorrected message:${payloadStr}`;
-
         outElem.textContent =out;
         document.getElementById('rx-output').style.display = 'block';
     });
