@@ -1,8 +1,8 @@
 const COLORS = {
-    "00": { name: "RED" },
-    "01": { name: "BLUE" },
-    "10": { name: "GREEN" },
-    "11": { name: "YELLOW" }
+    "00": { name: "Color A", hex: "#e74c3c" },
+    "01": { name: "Color B", hex: "#3498db" },
+    "10": { name: "Color C", hex: "#2ecc71" },
+    "11": { name: "Color D", hex: "#f1c40f" }
 };
 
 /* grid dimensions */
