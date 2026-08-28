@@ -360,7 +360,7 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
             if (clrIdx >= res.colors.length) return;
             const bits = res.colors[clrIdx];
             const word = COLORS[bits].name;
-            const utter = new SpeechSynthesisutter(word);
+            const utter = new SpeechSynthesisUtterance(word);
 
             utter.rate = 2.5;
             utter.pitch = 1;
