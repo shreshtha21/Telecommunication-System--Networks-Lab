@@ -397,35 +397,29 @@ document
 
         let clrIdx = 0;
 
-        function showNextColor() {
+function showNextColor() {
+    if (clrIdx >= res.colors.length) {
+        return;
+    }
 
-            if (clrIdx >= res.colors.length) {
-                txDiv.innerHTML = '';
-                return;
-            }
+    const bits = res.colors[clrIdx];
+    const word = COLORS[bits].name;
 
-            const bits = res.colors[clrIdx];
-            const word = COLORS[bits].name;
+    const utterance = new SpeechSynthesisUtterance(word);
 
-            // Speak the color
-            const utterance =
-                new SpeechSynthesisUtterance(word);
+    utterance.rate = 3;
+    utterance.pitch = 1;
+    utterance.volume = 1;
 
-            utterance.rate = 1;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-
-            speechSynthesis.speak(utterance);
-
-            clrIdx++;
-
-            // Wait before speaking the next color
-            txInterval = setTimeout(() => {
-                showNextColor();
-            }, 10);
-        }
-
+    utterance.onend = () => {
+        clrIdx++;
         showNextColor();
+    };
+
+    speechSynthesis.speak(utterance);
+}
+
+showNextColor();
     });
 
 
