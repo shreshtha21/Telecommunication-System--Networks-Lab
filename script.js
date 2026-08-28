@@ -528,19 +528,10 @@ ${res.errorDetected ? 'YES' : 'NO'}
 
             const errIdx = res.errorBitIndex;
 
-            payloadStr =
-                payloadStr.substring(0, errIdx) +
-                '[' +
-                payloadStr[errIdx] +
-                ']' +
-                payloadStr.substring(errIdx + 1);
+            payloadStr = payloadStr.substring(0, errIdx) + '[' + payloadStr[errIdx] + ']' +payloadStr.substring(errIdx + 1);
         }
 
         out += `\nCorrected message:${payloadStr}`;
-
         outElem.textContent = out;
-
-        document
-            .getElementById('rx-output')
-            .style.display = 'block';
+        document.getElementById('rx-output').style.display = 'block';
     });
