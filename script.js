@@ -15,7 +15,6 @@ function getGridDimen(N) {
     for(let r=1; r<=N;r++){
         const c = Math.ceil(N/r);
         const sum = r+c;
-
         if(sum < bestSum){
             bestR = r;
             bestC = c;
@@ -27,7 +26,6 @@ function getGridDimen(N) {
             }
         }
     }
-
     return {r: bestR,c: bestC};
 }
 
@@ -90,15 +88,11 @@ function encode(message, errorIndex){
                 `Error bit index must be between 0 and ${L - 1}.`
             );
         }
-
         const payloadIdx = 6 + errIdx;
-
-        txBits[payloadIdx] =
-            txBits[payloadIdx] === '0' ? '1' : '0';
+        txBits[payloadIdx] = txBits[payloadIdx] === '0' ? '1' : '0';
     }
 
     let finalStr = txBits.join('');
-
     if(finalStr.length % 2 !== 0){
         finalStr += '0';
     }
@@ -150,9 +144,7 @@ function decode(colorSeq) {
 
     // create grid
     const { r, c } = getGridDimen(paddedLen);
-
     const expectedTot = 6 + paddedLen + r + c;
-
     if (rxBits.length !== expectedTot && rxBits.length !== expectedTot + 1) {
         return {
             error: `Invalid transmission length. `
@@ -161,12 +153,7 @@ function decode(colorSeq) {
 
     // divide into secctions
     const rxPayloadBits = rxBits.slice(6, 6 + paddedLen);
-
-    const rxRowParity = rxBits.slice(
-        6 + paddedLen,
-        6 + paddedLen + r
-    );
-
+    const rxRowParity = rxBits.slice(6 + paddedLen, 6 + paddedLen + r);
     const rxColParity = rxBits.slice(
         6 + paddedLen + r,
         expectedTot
@@ -179,7 +166,6 @@ function decode(colorSeq) {
     ];
 
     const grid = [];
-
     for (let i = 0; i < r; i++) {
         grid.push(
             gridData.slice(i * c, (i + 1) * c)
@@ -189,7 +175,6 @@ function decode(colorSeq) {
     // calculate parity
     const calculatedRowParity = new Array(r).fill(0);
     const calculatedColParity = new Array(c).fill(0);
-
     for (let i = 0; i < r; i++) {
         for (let j = 0; j < c; j++) {
             const bit = grid[i][j];
@@ -201,7 +186,6 @@ function decode(colorSeq) {
 
     // find error
     const badRows = [];
-
     for (let i = 0; i < r; i++) {
         if (calculatedRowParity[i] !== rxRowParity[i]) {
             badRows.push(i);
@@ -209,7 +193,6 @@ function decode(colorSeq) {
     }
 
     const badCols = [];
-
     for (let j = 0; j < c; j++) {
         if (calculatedColParity[j] !== rxColParity[j]) {
             badCols.push(j);
@@ -218,10 +201,8 @@ function decode(colorSeq) {
 
     // find error index
     const correctedPayloadBits = [...rxPayloadBits];
-
     let errorDetected = false;
     let errorBitIndex = -1;
-
     if (badRows.length === 0 && badCols.length === 0) {
         errorDetected = false;
     }
@@ -238,12 +219,10 @@ function decode(colorSeq) {
                 error: "Parity points outside the transmitted payload."
             };
         }
-
         errorDetected = true;
 
         // correct the error bit
         correctedPayloadBits[gridIndex] ^= 1;
-
         if(gridIndex < L) {
             errorBitIndex = gridIndex;
         }
@@ -251,8 +230,7 @@ function decode(colorSeq) {
 
     else {
         return {
-            error: "Parity checks indicate an invalid " +
-                   "or unsupported error pattern."
+            error: "Parity checks indicate an invalid " + "or unsupported error pattern."
         };
     }
 
