@@ -49,59 +49,37 @@ function encode(message, errorIndex){
     const grid = [];
 
     for(let i=0; i<r;i++){
-        const row = gridData
-            .slice(i*c, (i+1)*c)
-            .split('')
-            .map(Number);
-
+        const row = gridData.slice(i*c, (i+1)*c).split('').map(Number);
         grid.push(row);
     }
 
     //calc parity
     const rowP = new Array(r).fill(0);
     const colP = new Array(c).fill(0);
-
     for(let i=0;i<r;i++){
         for(let j=0;j<c;j++){
-            const bit = grid[i][j];
-
-            rowP[i] ^= bit;
-            colP[j] ^= bit;
+            rowP[i] ^= grid[i][j];
+            colP[j] ^= grid[i][j];
         }
     }
 
     //final msg
-    const encodedBits =
-        lenBits +
-        padMsg +
-        rowP.join('') +
-        colP.join('');
+    const encodedBits =lenBits +padMsg +rowP.join('') +colP.join('');
 
     //add err
     const txBits = encodedBits.split('');
     const errIdx = Number.parseInt(errorIndex, 10);
 
     if (!Number.isNaN(errIdx) && errIdx >= 0) {
-        if(errIdx >= L){
-            throw new Error(
-                `Error bit index must be between 0 and ${L - 1}.`
-            );
-        }
-
-        const payloadIdx = 6 + errIdx;
-        txBits[payloadIdx] =
-            txBits[payloadIdx] === '0' ? '1' : '0';
+        if(errIdx >= L) throw new Error(`Error bit index must be between 0 and ${L - 1}.`);
+        txBits[6 + errIdx] = txBits[6 + errIdx] === '0' ? '1' : '0';
     }
 
     let finalStr = txBits.join('');
-
-    if(finalStr.length % 2 !== 0){
-        finalStr += '0';
-    }
-
+    if(finalStr.length % 2 !== 0) finalStr += '0';
+    
     //bits to colors
     const colors = [];
-
     for(let i = 0; i < finalStr.length; i += 2) {
         const chunk = finalStr.substring(i, i+2);
         colors.push(chunk);
