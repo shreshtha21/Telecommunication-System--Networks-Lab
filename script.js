@@ -1,8 +1,8 @@
 const COLORS = {
-    "00": { name: "Color A", hex: "#e74c3c" },
-    "01": { name: "Color B", hex: "#3498db" },
-    "10": { name: "Color C", hex: "#2ecc71" },
-    "11": { name: "Color D", hex: "#f1c40f" }
+    "00": { name: "Red", hex: "#e74c3c" },
+    "01": { name: "Blue", hex: "#3498db" },
+    "10": { name: "Green", hex: "#2ecc71" },
+    "11": { name: "Yellow", hex: "#f1c40f" }
 };
 
 /* grid dimensions */
@@ -153,8 +153,7 @@ function decode(colorSeq) {
 
     const expectedTot = 6 + paddedLen + r + c;
 
-    if (rxBits.length !== expectedTot &&
-        rxBits.length !== expectedTot + 1) {
+    if (rxBits.length !== expectedTot && rxBits.length !== expectedTot + 1) {
         return {
             error: `Invalid transmission length. `
         };
