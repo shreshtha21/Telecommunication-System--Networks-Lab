@@ -141,7 +141,10 @@ function decode(colorSeq) {
     const rxColParity = rxBits.slice(6 + paddedLen + r, expectedTot);
 
     // reconstruct grid
-    const gridData = [...rxPayload.bits, ...new Array(r * c - paddedLen).fill(0)];
+    const gridData = [
+            ...rxPayloadBits,
+            ...new Array(r * c - paddedLen).fill(0)
+        ];
     const grid = [];
     for (let i = 0; i < r; i++) {
         grid.push(gridData.slice( i * c, (i + 1) * c));
