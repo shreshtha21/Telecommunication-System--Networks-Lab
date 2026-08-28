@@ -350,22 +350,24 @@ document
         const errInput =
             document.getElementById('sender-err-idx').value.trim();
 
-        const errIdx =
-            errInput === '' ? -1 : parseInt(errInput, 10);
+            const errIdx =
+    errInput === '' || errInput === '-1'
+        ? -1
+        : parseInt(errInput, 10);
 
-        if (
-            errInput !== '' &&
-            (
-                !Number.isInteger(errIdx) ||
-                errIdx < 0 ||
-                errIdx >= msg.length
-            )
-        ) {
-            alert(
-                `Error index must be between 0 and ${msg.length - 1}.`
-            );
-            return;
-        }
+if (
+    errIdx !== -1 &&
+    (
+        !Number.isInteger(errIdx) ||
+        errIdx < 0 ||
+        errIdx >= msg.length
+    )
+) {
+    alert(
+        `Error index must be -1 or between 0 and ${msg.length - 1}.`
+    );
+    return;
+}
 
         // Encode
         let res;
@@ -407,7 +409,7 @@ function showNextColor() {
 
     const utterance = new SpeechSynthesisUtterance(word);
 
-    utterance.rate = 3;
+    utterance.rate = 2.5;
     utterance.pitch = 1;
     utterance.volume = 1;
 
