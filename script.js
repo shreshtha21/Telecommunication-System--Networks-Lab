@@ -1,8 +1,8 @@
 const COLORS = {
-    "00": { name: "Red", hex: "#e74c3c" },
-    "01": { name: "Blue", hex: "#3498db" },
-    "10": { name: "Green", hex: "#2ecc71" },
-    "11": { name: "Yellow", hex: "#f1c40f" }
+    "00": { name: "Color A", hex: "#e74c3c" },
+    "01": { name: "Color B", hex: "#3498db" },
+    "10": { name: "Color C", hex: "#2ecc71" },
+    "11": { name: "Color D", hex: "#f1c40f" }
 };
 
 /* grid dimensions */
@@ -15,6 +15,7 @@ function getGridDimen(N) {
     for(let r=1; r<=N;r++){
         const c = Math.ceil(N/r);
         const sum = r+c;
+
         if(sum < bestSum){
             bestR = r;
             bestC = c;
@@ -26,6 +27,7 @@ function getGridDimen(N) {
             }
         }
     }
+
     return {r: bestR,c: bestC};
 }
 
@@ -88,11 +90,15 @@ function encode(message, errorIndex){
                 `Error bit index must be between 0 and ${L - 1}.`
             );
         }
+
         const payloadIdx = 6 + errIdx;
-        txBits[payloadIdx] = txBits[payloadIdx] === '0' ? '1' : '0';
+
+        txBits[payloadIdx] =
+            txBits[payloadIdx] === '0' ? '1' : '0';
     }
 
     let finalStr = txBits.join('');
+
     if(finalStr.length % 2 !== 0){
         finalStr += '0';
     }
@@ -144,8 +150,11 @@ function decode(colorSeq) {
 
     // create grid
     const { r, c } = getGridDimen(paddedLen);
+
     const expectedTot = 6 + paddedLen + r + c;
-    if (rxBits.length !== expectedTot && rxBits.length !== expectedTot + 1) {
+
+    if (rxBits.length !== expectedTot &&
+        rxBits.length !== expectedTot + 1) {
         return {
             error: `Invalid transmission length. `
         };
@@ -153,7 +162,12 @@ function decode(colorSeq) {
 
     // divide into secctions
     const rxPayloadBits = rxBits.slice(6, 6 + paddedLen);
-    const rxRowParity = rxBits.slice(6 + paddedLen, 6 + paddedLen + r);
+
+    const rxRowParity = rxBits.slice(
+        6 + paddedLen,
+        6 + paddedLen + r
+    );
+
     const rxColParity = rxBits.slice(
         6 + paddedLen + r,
         expectedTot
@@ -166,6 +180,7 @@ function decode(colorSeq) {
     ];
 
     const grid = [];
+
     for (let i = 0; i < r; i++) {
         grid.push(
             gridData.slice(i * c, (i + 1) * c)
@@ -175,6 +190,7 @@ function decode(colorSeq) {
     // calculate parity
     const calculatedRowParity = new Array(r).fill(0);
     const calculatedColParity = new Array(c).fill(0);
+
     for (let i = 0; i < r; i++) {
         for (let j = 0; j < c; j++) {
             const bit = grid[i][j];
@@ -186,6 +202,7 @@ function decode(colorSeq) {
 
     // find error
     const badRows = [];
+
     for (let i = 0; i < r; i++) {
         if (calculatedRowParity[i] !== rxRowParity[i]) {
             badRows.push(i);
@@ -193,6 +210,7 @@ function decode(colorSeq) {
     }
 
     const badCols = [];
+
     for (let j = 0; j < c; j++) {
         if (calculatedColParity[j] !== rxColParity[j]) {
             badCols.push(j);
@@ -201,10 +219,12 @@ function decode(colorSeq) {
 
     // find error index
     const correctedPayloadBits = [...rxPayloadBits];
-    let errorDetected = false;
-    let errorBitIndex = -1;
+
+    let errDetected = false;
+    let errBitIdx = -1;
+
     if (badRows.length === 0 && badCols.length === 0) {
-        errorDetected = false;
+        errDetected = false;
     }
 
     else if (badRows.length === 1 && badCols.length === 1) {
@@ -219,18 +239,21 @@ function decode(colorSeq) {
                 error: "Parity points outside the transmitted payload."
             };
         }
-        errorDetected = true;
+
+        errDetected = true;
 
         // correct the error bit
         correctedPayloadBits[gridIndex] ^= 1;
+
         if(gridIndex < L) {
-            errorBitIndex = gridIndex;
+            errBitIdx = gridIndex;
         }
     }
 
     else {
         return {
-            error: "Parity checks indicate an invalid " + "or unsupported error pattern."
+            error: "Parity checks indicate an invalid " +
+                   "or unsupported error pattern."
         };
     }
 
@@ -249,8 +272,8 @@ function decode(colorSeq) {
         colParity: rxColParity.join(''),
         badRows: badRows,
         badCols: badCols,
-        errorDetected: errorDetected,
-        errorBitIndex: errorBitIndex,
+        errDetected: errDetected,
+        errBitIdx: errBitIdx,
         payload: correctedMessage
     };
 }
@@ -279,76 +302,42 @@ document
 
 
 //rcvr tab
-document
-    .getElementById('tab-receiver')
-    .addEventListener('click', () => {
-
-        document
-            .getElementById('tab-receiver')
-            .classList.add('active');
-
-        document
-            .getElementById('tab-sender')
-            .classList.remove('active');
-
-        document
-            .getElementById('receiver')
-            .classList.add('active-tab');
-
-        document
-            .getElementById('sender')
-            .classList.remove('active-tab');
+document.getElementById('tab-receiver').addEventListener('click', () => {
+        document.getElementById('tab-receiver').classList.add('active');
+        document.getElementById('tab-sender').classList.remove('active');
+        document.getElementById('receiver').classList.add('active-tab');
+        document.getElementById('sender').classList.remove('active-tab');
     });
 
 
 //sender
-let txInterval = null;
+        let txInt= null;
+        document.getElementById('btn-transmit').addEventListener('click', () => {
 
-document
-    .getElementById('btn-transmit')
-    .addEventListener('click', () => {
+        const msg =document.getElementById('sender-msg').value.trim();
 
-        const msg =
-            document.getElementById('sender-msg').value.trim();
-
-        // Validate message
         if (!/^[01]+$/.test(msg)) {
             alert("Message must contain only 0s and 1s.");
             return;
         }
 
-        // 6-bit length field
-        if (msg.length > 63) {
+        if(msg.length > 63){
             alert("Message too long for 6-bit length field.");
             return;
         }
 
-        // Error index
-        const errInput =
-            document.getElementById('sender-err-idx').value.trim();
+        //err index
+        const errIn =document.getElementById('sender-err-idx').value.trim();
+        const errIdx =errIn === '' || errIn === '-1'? -1: parseInt(errIn, 10);
+        if(errIdx !== -1 && (!Number.isInteger(errIdx) ||errIdx < 0 ||errIdx >= msg.length)){
+            alert(
+                `Error index must be -1 or between 0 and ${msg.length - 1}.`
+            );
+            return;
+        }
 
-            const errIdx =
-    errInput === '' || errInput === '-1'
-        ? -1
-        : parseInt(errInput, 10);
-
-if (
-    errIdx !== -1 &&
-    (
-        !Number.isInteger(errIdx) ||
-        errIdx < 0 ||
-        errIdx >= msg.length
-    )
-) {
-    alert(
-        `Error index must be -1 or between 0 and ${msg.length - 1}.`
-    );
-    return;
-}
-
-        // Encode
+//Encode
         let res;
-
         try {
             res = encode(msg, errIdx);
         } catch (e) {
@@ -356,181 +345,100 @@ if (
             return;
         }
 
-        // Transmission container
-        const txDiv = document.getElementById('tx-colors');
+        const txDiv= document.getElementById('tx-colors');
+        txDiv.innerHTML ='';
+        document.getElementById('sender-output').style.display = 'block';
 
-        txDiv.innerHTML = '';
-
-        document
-            .getElementById('sender-output')
-            .style.display = 'block';
-
-        // Stop any previous transmission
-        if (txInterval !== null) {
-            clearTimeout(txInterval);
-            txInterval = null;
+        if (txInt!== null) {
+            clearTimeout(txInt);
+            txInt = null;
         }
-
-        // Stop any previous speech
         speechSynthesis.cancel();
 
         let clrIdx = 0;
+        function showNextColor(){
+            if (clrIdx >= res.colors.length) return;
+            const bits = res.colors[clrIdx];
+            const word = COLORS[bits].name;
+            const utter = new SpeechSynthesisutter(word);
 
-function showNextColor() {
-    if (clrIdx >= res.colors.length) {
-        return;
-    }
+            utter.rate = 2.5;
+            utter.pitch = 1;
+            utter.volume = 1;
 
-    const bits = res.colors[clrIdx];
-    const word = COLORS[bits].name;
-
-    const utterance = new SpeechSynthesisUtterance(word);
-
-    utterance.rate = 2.5;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    utterance.onend = () => {
-        clrIdx++;
+            utter.onend = () => {
+                clrIdx++;
+                showNextColor();
+            };
+            speechSynthesis.speak(utter);
+        }
         showNextColor();
-    };
-
-    speechSynthesis.speak(utterance);
-}
-
-showNextColor();
     });
 
 
 //Receiver
-let receivedColors = [];
+    let rcvdClrs = [];
+    function renderrcvdClrs(){
+        const rxDiv =document.getElementById('rx-sequence');
+        rxDiv.innerHTML = '';
+        rcvdClrs.forEach(c =>{
+            const block =document.createElement('div');
+            block.className = 'color-block';
+            block.innerHTML =`<span>${COLORS[c].name}</span> <span>${c}</span>`;
+            rxDiv.appendChild(block);
+        });
+    }
 
-function renderReceivedColors() {
-
-    const rxDiv =
-        document.getElementById('rx-sequence');
-
-    rxDiv.innerHTML = '';
-
-    receivedColors.forEach(c => {
-
-        const block =
-            document.createElement('div');
-
-        block.className = 'color-block';
-
-        block.innerHTML =
-            `<span>${COLORS[c].name}</span> <span>${c}</span>`;
-
-        rxDiv.appendChild(block);
-    });
-}
-
-
-document
-    .querySelectorAll('.color-btn')
-    .forEach(btn => {
-
+    document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-
-            receivedColors.push(btn.dataset.bits);
-
-            renderReceivedColors();
+            rcvdClrs.push(btn.dataset.bits);
+            renderrcvdClrs();
         });
     });
 
-
-//backspace button
-document
-    .getElementById('btn-rx-back')
-    .addEventListener('click', () => {
-
-        receivedColors.pop();
-
-        renderReceivedColors();
+    //backspace btn
+    document.getElementById('btn-rx-back').addEventListener('click', () => {
+        rcvdClrs.pop();
+        renderrcvdClrs();
     });
 
-
-//clear button
-document
-    .getElementById('btn-rx-clear')
-    .addEventListener('click', () => {
-
-        receivedColors = [];
-
-        renderReceivedColors();
-
-        document
-            .getElementById('rx-output')
-            .style.display = 'none';
+    //clear btn
+    document.getElementById('btn-rx-clear').addEventListener('click', () => {
+        rcvdClrs = [];
+        renderrcvdClrs();
+        document.getElementById('rx-output').style.display = 'none';
     });
 
-
-//decode button
-document
-    .getElementById('btn-rx-decode')
-    .addEventListener('click', () => {
-
-        if (receivedColors.length === 0) {
+    //decode button
+    document.getElementById('btn-rx-decode').addEventListener('click', () => {
+        if(rcvdClrs.length ===0){
             alert("Please enter the received colors first.");
             return;
         }
-
-        const res = decode(receivedColors);
-
-        const outElem =
-            document.getElementById('rx-result');
-
-        if (res.error) {
-            outElem.textContent = res.error;
-
-            document
-                .getElementById('rx-output')
-                .style.display = 'block';
-
+        const res= decode(rcvdClrs);
+        const outElem =document.getElementById('rx-result');
+        if(res.error){
+            outElem.textContent= res.error;
+            document.getElementById('rx-output').style.display ='block';
             return;
         }
+        const rxBits =rcvdClrs.join('');
+        let out =`Received bitstream: ${rxBits}
 
-        const rxBits = receivedColors.join('');
-
-        let out =
-            `Received bitstream:
-${rxBits}
-
-Error detected:
-${res.errorDetected ? 'YES' : 'NO'}
-`;
-
+        Error detected: ${res.errDetected ? 'YES' : 'NO'}`;
         //error
-        if (res.errorDetected) {
-
-            if (res.errorBitIndex >= 0) {
-
-                out +=
-                    `Detected error bit index ` +
-                    `(0-based in original message): ` +
-                    `${res.errorBitIndex}\n`;
-
-            } else {
-
-                out +=
-                    `Error detected in padding/parity area.\n`;
-            }
+        if(res.errDetected){
+            if(res.errBitIdx >=0)
+                out +=`Detected error bit index ` + `(0-based in original message): ` +`${res.errBitIdx}\n`;
+            else out +=`Error detected in padding/parity area.\n`;
         }
 
         //correct message
         let payloadStr = res.payload;
-
-        if (
-            res.errorDetected &&
-            res.errorBitIndex >= 0
-        ) {
-
-            const errIdx = res.errorBitIndex;
-
+        if(res.errDetected && res.errBitIdx >= 0){
+            const errIdx = res.errBitIdx;
             payloadStr = payloadStr.substring(0, errIdx) + '[' + payloadStr[errIdx] + ']' +payloadStr.substring(errIdx + 1);
         }
-
         out += `\nCorrected message:${payloadStr}`;
         outElem.textContent = out;
         document.getElementById('rx-output').style.display = 'block';
