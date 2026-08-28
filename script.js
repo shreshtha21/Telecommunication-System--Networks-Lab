@@ -1,13 +1,13 @@
 const COLORS = {
-    "00": { name: "Red", hex: "#e74c3c" },
-    "01": { name: "Blue", hex: "#3498db" },
-    "10": { name: "Green", hex: "#2ecc71" },
-    "11": { name: "Yellow", hex: "#f1c40f" }
+    "00": {name:"Red", hex:"#e74c3c"},
+    "01": {name:"Blue", hex:"#3498db"},
+    "10": {name:"Green", hex:"#2ecc71"},
+    "11": {name:"Yellow", hex:"#f1c40f"}
 };
 
-/* grid dimensions */
+// grid dims
 function getGridDimen(N) {
-    if(N === 0) {return { r: 0, c: 0 };}
+    if(N === 0) {return {r: 0, c: 0};}
     let bestR = 1;
     let bestC = N;
     let bestSum = Infinity;
@@ -15,7 +15,6 @@ function getGridDimen(N) {
     for(let r=1; r<=N;r++){
         const c = Math.ceil(N/r);
         const sum = r+c;
-
         if(sum < bestSum){
             bestR = r;
             bestC = c;
@@ -27,13 +26,11 @@ function getGridDimen(N) {
             }
         }
     }
-
     return {r: bestR,c: bestC};
 }
 
-
 function encode(message, errorIndex){
-    //length
+    //len
     const L = message.length;
     const lenBits = L.toString(2).padStart(6, '0');
 
@@ -80,7 +77,7 @@ function encode(message, errorIndex){
         rowP.join('') +
         colP.join('');
 
-    //introduce err
+    //add err
     const txBits = encodedBits.split('');
     const errIdx = Number.parseInt(errorIndex, 10);
 
@@ -92,7 +89,6 @@ function encode(message, errorIndex){
         }
 
         const payloadIdx = 6 + errIdx;
-
         txBits[payloadIdx] =
             txBits[payloadIdx] === '0' ? '1' : '0';
     }
