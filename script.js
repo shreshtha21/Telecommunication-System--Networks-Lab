@@ -430,7 +430,9 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
         //error
         if(res.errDetected){
             if(res.errBitIdx >=0)
-                out +=`Detected error bit index ` + `(0-based in original message): ` +`${res.errBitIdx}\n`;
+                out +=
+            `\nDetected error bit index ` + 
+            `(0-based in original message): ` +`${res.errBitIdx}\n`;
             else out +=`Error detected in padding/parity area.\n`;
         }
 
