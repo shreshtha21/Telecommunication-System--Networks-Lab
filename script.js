@@ -1,8 +1,8 @@
 const COLORS = {
-    "00": { name: "Color A", hex: "#e74c3c" },
-    "01": { name: "Color B", hex: "#3498db" },
-    "10": { name: "Color C", hex: "#2ecc71" },
-    "11": { name: "Color D", hex: "#f1c40f" }
+    "00": { name: "Red", hex: "#e74c3c" },
+    "01": { name: "Blue", hex: "#3498db" },
+    "10": { name: "Green", hex: "#2ecc71" },
+    "11": { name: "Yellow", hex: "#f1c40f" }
 };
 
 /* grid dimensions */
@@ -378,12 +378,13 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
 
 //Receiver
     let rcvdClrs = [];
-    function renderrcvdClrs(){
+    function renderRcvdClrs(){
         const rxDiv =document.getElementById('rx-sequence');
         rxDiv.innerHTML = '';
         rcvdClrs.forEach(c =>{
             const block =document.createElement('div');
             block.className = 'color-block';
+            block.style.backgroundColor = COLORS[c].hex;
             block.innerHTML =`<span>${COLORS[c].name}</span> <span>${c}</span>`;
             rxDiv.appendChild(block);
         });
@@ -392,20 +393,20 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
     document.querySelectorAll('.color-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             rcvdClrs.push(btn.dataset.bits);
-            renderrcvdClrs();
+            renderRcvdClrs();
         });
     });
 
     //backspace btn
     document.getElementById('btn-rx-back').addEventListener('click', () => {
         rcvdClrs.pop();
-        renderrcvdClrs();
+        renderRcvdClrs();
     });
 
     //clear btn
     document.getElementById('btn-rx-clear').addEventListener('click', () => {
         rcvdClrs = [];
-        renderrcvdClrs();
+        renderRcvdClrs();
         document.getElementById('rx-output').style.display = 'none';
     });
 
