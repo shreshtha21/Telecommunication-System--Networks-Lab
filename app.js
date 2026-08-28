@@ -1,24 +1,9 @@
-document
-    .getElementById('tab-sender')
-    .addEventListener('click', () => {
-
-        document
-            .getElementById('tab-sender')
-            .classList.add('active');
-
-        document
-            .getElementById('tab-receiver')
-            .classList.remove('active');
-
-        document
-            .getElementById('sender')
-            .classList.add('active-tab');
-
-        document
-            .getElementById('receiver')
-            .classList.remove('active-tab');
+document.getElementById('tab-sender').addEventListener('click', () => {
+        document.getElementById('tab-sender').classList.add('active');
+        document.getElementById('tab-receiver').classList.remove('active');
+        document.getElementById('sender').classList.add('active-tab');
+        document.getElementById('receiver').classList.remove('active-tab');
     });
-
 
 //rcvr tab
 document.getElementById('tab-receiver').addEventListener('click', () => {
@@ -32,7 +17,6 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
 //sender
         let txInt= null;
         document.getElementById('btn-transmit').addEventListener('click', () => {
-
         const msg =document.getElementById('sender-msg').value.trim();
 
         if (!/^[01]+$/.test(msg)) {
@@ -47,8 +31,8 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
 
         //err index
         const errIn =document.getElementById('sender-err-idx').value.trim();
-        const errIdx =errIn === '' || errIn === '-1'? -1: parseInt(errIn, 10);
-        if(errIdx !== -1 && (!Number.isInteger(errIdx) ||errIdx < 0 ||errIdx >= msg.length)){
+        const errIdx =errIn === ''|| errIn === '-1'? -1: parseInt(errIn, 10);
+        if(errIdx !== -1 &&(!Number.isInteger(errIdx) ||errIdx < 0 ||errIdx >= msg.length)){
             alert(
                 `Error index must be -1 or between 0 and ${msg.length - 1}.`
             );
@@ -66,7 +50,7 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
 
         const txDiv= document.getElementById('tx-colors');
         txDiv.innerHTML ='';
-        document.getElementById('sender-output').style.display = 'block';
+        document.getElementById('sender-output').style.display= 'block';
 
         if (txInt!== null) {
             clearTimeout(txInt);
@@ -74,12 +58,12 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
         }
         speechSynthesis.cancel();
 
-        let clrIdx = 0;
+        let clrIdx =0;
         function showNextColor(){
             if (clrIdx >= res.colors.length) return;
-            const bits = res.colors[clrIdx];
-            const word = COLORS[bits].name;
-            const utter = new SpeechSynthesisUtterance(word);
+            const bits= res.colors[clrIdx];
+            const word =COLORS[bits].name;
+            const utter= new SpeechSynthesisUtterance(word);
 
             utter.rate = 2.5;
             utter.pitch = 1;
@@ -99,7 +83,7 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
     let rcvdClrs = [];
     function renderRcvdClrs(){
         const rxDiv =document.getElementById('rx-sequence');
-        rxDiv.innerHTML = '';
+        rxDiv.innerHTML ='';
         rcvdClrs.forEach(c =>{
             const block =document.createElement('div');
             block.className = 'color-block';
@@ -146,9 +130,8 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
         let out =`Received bitstream: ${rxBits}
 
         Error detected: ${res.errDetected ? 'YES' : 'NO'}`;
-        //error
         if(res.errDetected){
-            if(res.errBitIdx >=0)
+            if(res.errBitIdx>=0)
                 out +=
             `\nDetected error bit index ` + 
             `(0-based in original message): ` +`${res.errBitIdx}\n`;
@@ -156,12 +139,12 @@ document.getElementById('tab-receiver').addEventListener('click', () => {
         }
 
         //correct message
-        let payloadStr = res.payload;
-        if(res.errDetected && res.errBitIdx >= 0){
-            const errIdx = res.errBitIdx;
-            payloadStr = payloadStr.substring(0, errIdx) + '[' + payloadStr[errIdx] + ']' +payloadStr.substring(errIdx + 1);
+        let payloadStr =res.payload;
+        if(res.errDetected && res.errBitIdx>= 0){
+            const errIdx= res.errBitIdx;
+            payloadStr =payloadStr.substring(0, errIdx) + '[' + payloadStr[errIdx] + ']' +payloadStr.substring(errIdx + 1);
         }
         out += `\nCorrected message:${payloadStr}`;
-        outElem.textContent = out;
+        outElem.textContent =out;
         document.getElementById('rx-output').style.display = 'block';
     });
